@@ -41,6 +41,9 @@ highlight LineNr ctermfg=black
 " Indentation
 filetype plugin indent on
 
+" Backspace fix
+set backspace=indent,eol,start
+
 " testing
 let g:airline#extensions#branch#enabled = 1
 "let g:airline#extensions#branch#format = 'CustomBranchName'
