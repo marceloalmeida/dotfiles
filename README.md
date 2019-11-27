@@ -5,6 +5,10 @@
 ./install.sh
 ```
 
+```sh
+brew bundle
+```
+
 ## References
  * https://github.com/mitchellh/dotfiles
  * https://gist.github.com/cloud8421/3742505
