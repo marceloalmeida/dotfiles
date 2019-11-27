@@ -93,3 +93,7 @@ command! -range=% CP  <line1>,<line2>w !pbcopy
 
 "Auto Commands
 autocmd BufWritePre * call TrimEndLines()
+
+"Mappings
+let mapleader=","
+nmap <leader>d :NERDTreeToggle<CR>
