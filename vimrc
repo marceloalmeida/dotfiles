@@ -44,6 +44,9 @@ filetype plugin indent on
 " Backspace fix
 set backspace=indent,eol,start
 
+" Enable fzf
+set rtp+=/usr/local/opt/fzf
+
 " testing
 let g:airline#extensions#branch#enabled = 1
 "let g:airline#extensions#branch#format = 'CustomBranchName'
@@ -97,3 +100,4 @@ autocmd BufWritePre * call TrimEndLines()
 "Mappings
 let mapleader=","
 nmap <leader>d :NERDTreeToggle<CR>
+nmap <leader>f :Files<CR>
