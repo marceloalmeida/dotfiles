@@ -32,6 +32,10 @@ set title                 " Set the title for gvim
 set visualbell            " Use a visual bell to notify us
 set incsearch             " Start showing results as you type
 set smartcase             " Be smart about case sensitivity when searching
+set cursorline            " Set cursor line
+"set cursorcolumn          " Set cursor line
+"hi CursorColumn   cterm=NONE ctermbg=8 ctermfg=NONE
+"hi CursorLine   cterm=NONE ctermbg=8 ctermfg=NONE
 
 " Line numbers and coloring
 set number
@@ -46,6 +50,8 @@ set backspace=indent,eol,start
 
 " Enable fzf
 set rtp+=/usr/local/opt/fzf
+
+set mmp=5000
 
 " testing
 let g:airline#extensions#branch#enabled = 1

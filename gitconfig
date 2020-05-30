@@ -1,0 +1,25 @@
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  process = git-lfs filter-process
+  required = true
+  smudge = git-lfs smudge -- %f
+
+[user]
+  email = me@malmeida.dev
+  name = Marcelo Almeida
+  signingkey = B9B1823D
+
+[commit]
+  gpgsign = true
+
+[diff "gpg"]
+  textconv = gpg --no-tty --decrypt
+
+[diff "ansible-vault"]
+  textconv = ansible-vault view --vault-password-file=$(git rev-parse --show-toplevel)/$(find . -type f -name vault-secret.sh)
+
+[alias]
+  prettylog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+
+[github]
+  user = marceloalmeida
