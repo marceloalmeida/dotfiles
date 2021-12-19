@@ -96,6 +96,75 @@ function TrimEndLines()
     call setpos('.', save_cursor)
 endfunction
 
+function! HighlightRepeats() range
+  let lineCounts = {}
+  let lineNum = a:firstline
+  while lineNum <= a:lastline
+    let lineText = getline(lineNum)
+    if lineText != ""
+      let lineCounts[lineText] = (has_key(lineCounts, lineText) ? lineCounts[lineText] : 0) + 1
+    endif
+    let lineNum = lineNum + 1
+  endwhile
+  exe 'syn clear Repeat'
+  for lineText in keys(lineCounts)
+    if lineCounts[lineText] >= 2
+      exe 'syn match Repeat "^' . escape(lineText, '".\^$*[]') . '$"'
+    endif
+  endfor
+endfunction
+
+command! -range=% HighlightRepeats <line1>,<line2>call HighlightRepeats()
+
+function! s:sort_by_header(bang, pat) range
+  let pat = a:pat
+  let opts = ""
+  if pat =~ '^\s*[nfxbo]\s'
+    let opts = matchstr(pat, '^\s*\zs[nfxbo]')
+    let pat = matchstr(pat, '^\s*[nfxbo]\s*\zs.*')
+  endif
+  let pat = substitute(pat, '^\s*', '', '')
+  let pat = substitute(pat, '\s*$', '', '')
+  let sep = '/'
+  if len(pat) > 0 && pat[0] == matchstr(pat, '.$') && pat[0] =~ '\W'
+    let [sep, pat] = [pat[0], pat[1:-2]]
+  endif
+  if pat == ''
+    let pat = @/
+  endif
+
+  let ranges = []
+  execute a:firstline . ',' . a:lastline . 'g' . sep . pat . sep . 'call add(ranges, line("."))'
+
+  let converters = {
+        \ 'n': {s-> str2nr(matchstr(s, '-\?\d\+.*'))},
+        \ 'x': {s-> str2nr(matchstr(s, '-\?\%(0[xX]\)\?\x\+.*'), 16)},
+        \ 'o': {s-> str2nr(matchstr(s, '-\?\%(0\)\?\x\+.*'), 8)},
+        \ 'b': {s-> str2nr(matchstr(s, '-\?\%(0[bB]\)\?\x\+.*'), 2)},
+        \ 'f': {s-> str2float(matchstr(s, '-\?\d\+.*'))},
+        \ }
+  let arr = []
+  for i in range(len(ranges))
+    let end = max([get(ranges, i+1, a:lastline+1) - 1, ranges[i]])
+    let line = getline(ranges[i])
+    let d = {}
+    let d.key = call(get(converters, opts, {s->s}), [strpart(line, match(line, pat))])
+    let d.group = getline(ranges[i], end)
+    call add(arr, d)
+  endfor
+  call sort(arr, {a,b -> a.key == b.key ? 0 : (a.key < b.key ? -1 : 1)})
+  if a:bang
+    call reverse(arr)
+  endif
+  let lines = []
+  call map(arr, 'extend(lines, v:val.group)')
+  let start = max([a:firstline, get(ranges, 0, 0)])
+  call setline(start, lines)
+  call setpos("'[", start)
+  call setpos("']", start+len(lines)-1)
+endfunction
+command! -range=% -bang -nargs=+ SortGroup <line1>,<line2>call <SID>sort_by_header(<bang>0, <q-args>)
+
 " Commands
 command! -range=% CL  <line1>,<line2>w !curl -s -F 'clbin=<-' https://clbin.com | tr -d '\n' | pbcopy
 command! -range=% CP  <line1>,<line2>w !pbcopy
@@ -107,3 +176,10 @@ autocmd BufWritePre * call TrimEndLines()
 let mapleader=","
 nmap <leader>d :NERDTreeToggle<CR>
 nmap <leader>f :Files<CR>
+
+" persist START
+set undofile " Maintain undo history between sessions
+set undodir=~/.vim/undodir
+
+" Secure vim for gopass
+au BufNewFile,BufRead /private/**/gopass** setlocal noswapfile nobackup noundofile
