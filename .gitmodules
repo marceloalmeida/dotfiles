@@ -22,3 +22,9 @@
 [submodule "zsh/git-fuzzy"]
 	path = zsh/git-fuzzy
 	url = https://github.com/bigH/git-fuzzy.git
+[submodule "vim/bundle/vim-packer"]
+	path = vim/bundle/vim-packer
+	url = git@github.com:hashivim/vim-packer.git
+[submodule "vim/bundle/vim-hcl"]
+	path = vim/bundle/vim-hcl
+	url = git@github.com:b4b4r07/vim-hcl.git
